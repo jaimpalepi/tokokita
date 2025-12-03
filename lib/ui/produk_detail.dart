@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:tokokita/bloc/produk_bloc.dart';
 import 'package:tokokita/model/produk.dart';
 import 'package:tokokita/ui/produk_form.dart';
+import 'package:tokokita/ui/produk_page.dart';
+import 'package:tokokita/widget/warning_dialog.dart';
 
 class ProdukDetail extends StatefulWidget {
-  Produk? produk;
-  ProdukDetail({Key? key, this.produk}) : super(key: key);
-
+  final Produk? produk;
+  const ProdukDetail({super.key, this.produk});
   @override
-  _ProdukDetailState createState() => _ProdukDetailState();
+  State<ProdukDetail> createState() => _ProdukDetailState();
 }
 
 class _ProdukDetailState extends State<ProdukDetail> {
@@ -15,7 +17,7 @@ class _ProdukDetailState extends State<ProdukDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detail Produk Zaim'),
+        title: const Text("Detail Produk Zaim"),
       ),
       body: Center(
         child: Column(
@@ -32,7 +34,7 @@ class _ProdukDetailState extends State<ProdukDetail> {
               "Harga : Rp. ${widget.produk!.hargaProduk.toString()}",
               style: const TextStyle(fontSize: 18.0),
             ),
-            _tombolHapusEdit()
+            _tombolHapusEdit(),
           ],
         ),
       ),
@@ -49,9 +51,7 @@ class _ProdukDetailState extends State<ProdukDetail> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProdukForm(
-                  produk: widget.produk!,
-                ),
+                builder: (context) => ProdukForm(produk: widget.produk!),
               ),
             );
           },
@@ -71,16 +71,27 @@ class _ProdukDetailState extends State<ProdukDetail> {
         OutlinedButton(
           child: const Text("Ya"),
           onPressed: () {
-            Navigator.of(context).pop(); // kembali
+            ProdukBloc.deleteProduk(id: widget.produk!.id!).then(
+                (value) => {
+                      if (mounted)
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ProdukPage()))
+                    }, onError: (error) {
+              if (!mounted) return;
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) => const WarningDialog(
+                        description: "Hapus data gagal, silahkan coba lagi",
+                      ));
+            });
           },
         ),
         OutlinedButton(
           child: const Text("Batal"),
           onPressed: () => Navigator.pop(context),
-        )
+        ),
       ],
     );
-
     showDialog(builder: (context) => alertDialog, context: context);
   }
 }
