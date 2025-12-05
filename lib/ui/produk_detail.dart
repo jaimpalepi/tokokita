@@ -77,12 +77,13 @@ class _ProdukDetailState extends State<ProdukDetail> {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const ProdukPage()))
                     }, onError: (error) {
-              if (!mounted) return;
+              if (!mounted) return false;
               showDialog(
                   context: context,
                   builder: (BuildContext context) => const WarningDialog(
                         description: "Hapus data gagal, silahkan coba lagi",
                       ));
+              return false;
             });
           },
         ),

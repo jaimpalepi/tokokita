@@ -1,5 +1,5 @@
 class ApiUrl {
-  static const String baseUrl = 'http://localhost:8080/';
+  static const String baseUrl = 'http://192.168.1.7:8080';
 
   static const String registrasi = baseUrl + '/registrasi';
   static const String login = baseUrl + '/login';

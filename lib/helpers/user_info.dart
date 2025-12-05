@@ -8,6 +8,7 @@ class UserInfo {
 
   Future<String?> getToken() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
+
     return pref.getString("token");
   }
 

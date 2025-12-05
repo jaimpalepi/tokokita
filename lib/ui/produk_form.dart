@@ -142,12 +142,13 @@ class _ProdukFormState extends State<ProdukForm> {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => const ProdukPage()));
     }, onError: (error) {
-      if (!mounted) return;
+      if (!mounted) return null;
       showDialog(
           context: context,
           builder: (BuildContext context) => const WarningDialog(
                 description: "Simpan gagal, silahkan coba lagi",
               ));
+      return null;
     });
     setState(() {
       _isLoading = false;
@@ -167,12 +168,13 @@ class _ProdukFormState extends State<ProdukForm> {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => const ProdukPage()));
     }, onError: (error) {
-      if (!mounted) return;
+      if (!mounted) return null;
       showDialog(
           context: context,
           builder: (BuildContext context) => const WarningDialog(
                 description: "Permintaan ubah data gagal, silahkan coba lagi",
               ));
+      return null;
     });
     setState(() {
       _isLoading = false;

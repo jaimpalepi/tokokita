@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:tokokita/helpers/user_info.dart';
@@ -8,9 +9,26 @@ class Api {
     var token = await UserInfo().getToken();
     var responseJson;
     try {
-      final response = await http.post(Uri.parse(url),
-        body: data,
-        headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
+      print("=== API POST ===");
+      print("URL: $url");
+      print("Data: $data");
+      print("Token: $token");
+
+      final response = await http.post(
+        Uri.parse(url),
+        body: jsonEncode(data),
+        headers: token != null
+            ? {
+                HttpHeaders.authorizationHeader: "Bearer $token",
+                HttpHeaders.contentTypeHeader: "application/json",
+                'auth-key': token, // Tambahkan auth-key header
+              }
+            : {HttpHeaders.contentTypeHeader: "application/json"},
+      );
+
+      print("Response Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
       responseJson = _returnResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
@@ -22,8 +40,23 @@ class Api {
     var token = await UserInfo().getToken();
     var responseJson;
     try {
-      final response = await http.get(Uri.parse(url),
-        headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
+      print("=== API GET ===");
+      print("URL: $url");
+      print("Token: $token");
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: token != null
+            ? {
+                HttpHeaders.authorizationHeader: "Bearer $token",
+                'auth-key': token,
+              }
+            : {},
+      );
+
+      print("Response Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
       responseJson = _returnResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
@@ -35,10 +68,25 @@ class Api {
     var token = await UserInfo().getToken();
     var responseJson;
     try {
-      final response = await http.put(Uri.parse(url), body: data, headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-        HttpHeaders.contentTypeHeader: "application/json"
-      });
+      print("=== API PUT ===");
+      print("URL: $url");
+      print("Data: $data");
+      print("Token: $token");
+
+      final response = await http.put(
+        Uri.parse(url),
+        body: data,
+        headers: token != null
+            ? {
+                HttpHeaders.authorizationHeader: "Bearer $token",
+                HttpHeaders.contentTypeHeader: "application/json",
+                'auth-key': token,
+              }
+            : {HttpHeaders.contentTypeHeader: "application/json"},
+      );
+
+      print("Response Status: ${response.statusCode}");
+
       responseJson = _returnResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
@@ -50,8 +98,22 @@ class Api {
     var token = await UserInfo().getToken();
     var responseJson;
     try {
-      final response = await http.delete(Uri.parse(url),
-        headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
+      print("=== API DELETE ===");
+      print("URL: $url");
+      print("Token: $token");
+
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: token != null
+            ? {
+                HttpHeaders.authorizationHeader: "Bearer $token",
+                'auth-key': token,
+              }
+            : {},
+      );
+
+      print("Response Status: ${response.statusCode}");
+
       responseJson = _returnResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
@@ -62,6 +124,7 @@ class Api {
   dynamic _returnResponse(http.Response response) {
     switch (response.statusCode) {
       case 200:
+      case 201:
         return response;
       case 400:
         throw BadRequestException(response.body.toString());
@@ -73,7 +136,8 @@ class Api {
       case 500:
       default:
         throw FetchDataException(
-          'Error occured while Communication with Server with StatusCode: ${response.statusCode}');
+          'Error occured while Communication with Server with StatusCode : ${response.statusCode}',
+        );
     }
   }
 }
